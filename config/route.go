@@ -6,11 +6,12 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"subscription-back/docs"
 	"subscription-back/internal/controller/rest"
+	"subscription-back/internal/util/middleware"
 )
 
 func InitRoute() *gin.Engine {
 	router := gin.New()
-	//router.Use(middleware.AuthenticationMiddleware)
+	router.Use(middleware.EnableCORS)
 
 	router.POST("/subscription/create", rest.CreateSubscription)
 

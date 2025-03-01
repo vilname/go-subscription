@@ -17,22 +17,24 @@ func NewSubscriptionService(ctx *gin.Context) *SubscriptionService {
 	}
 }
 
-func (service *SubscriptionService) Create(dto model.CreateSubscriptionDto) error {
+func (service *SubscriptionService) Create(dto model.CreateSubscriptionDto) ( model.CreateSubscriptionResult, error) {
+	var createSubscriptionResult model.CreateSubscriptionResult
+
 	id, err := service.repository.FindByEmail(dto.Email)
 
 	if err != nil {
-		return err
+		return createSubscriptionResult, err
 	}
 
 	if id != 0 {
-		return errors.New("На эту почту уже имеется подписка")
+		return createSubscriptionResult, errors.New("На эту почту уже имеется подписка")
 	}
 
-	err = service.repository.CreateSubscription(dto.Email)
+	createSubscriptionResult.Hash, err = service.repository.CreateSubscription(dto.Email)
 
 	if err != nil {
-		return err
+		return createSubscriptionResult, err
 	}
 
-	return nil
+	return createSubscriptionResult, nil
 }

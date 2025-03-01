@@ -21,17 +21,17 @@ func NewSubscriptionRepository(ctx *gin.Context) *SubscriptionRepository {
 	}
 }
 
-func (repository *SubscriptionRepository) CreateSubscription(email string) error {
+func (repository *SubscriptionRepository) CreateSubscription(email string) (string, error) {
 	query := "insert into subscription(email, hash, created) values ($1, $2, NOW())"
 
 	uuidHash, _ := uuid.NewUUID()
 
 	_, err := repository.db.Exec(repository.ctx, query, email, uuidHash)
 	if err != nil {
-		return err
+		return uuidHash.String(), err
 	}
 
-	return nil
+	return uuidHash.String(), nil
 }
 
 func (repository *SubscriptionRepository) FindByEmail(email string) (int, error) {

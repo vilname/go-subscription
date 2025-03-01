@@ -2,9 +2,9 @@ package rest
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
+	"net/http"
 	"subscription-back/internal/model"
 	"subscription-back/internal/service"
 	"subscription-back/internal/util/helper"
@@ -20,11 +20,6 @@ import (
 // @Failure	500	{object} helper.ErrorResponse "Другие ошибки"
 // @Router /subscription/create [post]
 func CreateSubscription(ctx *gin.Context) {
-	a := 1
-	_ = a
-
-	fmt.Println("1111111111111111111")
-
 	var subscriptionDto model.CreateSubscriptionDto
 
 	body, err := io.ReadAll(ctx.Request.Body)
@@ -40,10 +35,12 @@ func CreateSubscription(ctx *gin.Context) {
 	}
 
 	subscriptionService := service.NewSubscriptionService(ctx)
-	err = subscriptionService.Create(subscriptionDto)
+	createSubscriptionResult, err := subscriptionService.Create(subscriptionDto)
 
 	if err != nil {
 		helper.ErrorResponseMethod(ctx, err)
 		return
 	}
+
+	ctx.JSON(http.StatusOK, createSubscriptionResult)
 }
