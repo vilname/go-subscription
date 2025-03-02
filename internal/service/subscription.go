@@ -17,10 +17,10 @@ func NewSubscriptionService(ctx *gin.Context) *SubscriptionService {
 	}
 }
 
-func (service *SubscriptionService) Create(dto model.CreateSubscriptionDto) ( model.CreateSubscriptionResult, error) {
+func (service *SubscriptionService) Create(dto model.CreateSubscriptionDto) (model.CreateSubscriptionResult, error) {
 	var createSubscriptionResult model.CreateSubscriptionResult
 
-	id, err := service.repository.FindByEmail(dto.Email)
+	id, err := service.repository.GetByEmail(dto.Email)
 
 	if err != nil {
 		return createSubscriptionResult, err
@@ -35,6 +35,8 @@ func (service *SubscriptionService) Create(dto model.CreateSubscriptionDto) ( mo
 	if err != nil {
 		return createSubscriptionResult, err
 	}
+
+	//SendEmail(createSubscriptionResult.Hash)
 
 	return createSubscriptionResult, nil
 }

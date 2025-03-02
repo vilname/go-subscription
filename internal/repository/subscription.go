@@ -34,12 +34,26 @@ func (repository *SubscriptionRepository) CreateSubscription(email string) (stri
 	return uuidHash.String(), nil
 }
 
-func (repository *SubscriptionRepository) FindByEmail(email string) (int, error) {
+func (repository *SubscriptionRepository) GetByEmail(email string) (int, error) {
 	var id int
 
 	query := "select id from subscription where email = $1"
 
 	err := repository.db.QueryRow(repository.ctx, query, email).Scan(&id)
+
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return id, err
+	}
+
+	return id, nil
+}
+
+func (repository *SubscriptionRepository) GetByHash(hash string) (int, error) {
+	var id int
+
+	query := "select id from subscription where hash = $1"
+
+	err := repository.db.QueryRow(repository.ctx, query, hash).Scan(&id)
 
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return id, err

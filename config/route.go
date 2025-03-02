@@ -12,8 +12,10 @@ import (
 func InitRoute() *gin.Engine {
 	router := gin.New()
 	router.Use(middleware.EnableCORS)
+	router.Use(middleware.Auth)
 
 	router.POST("/subscription/create", rest.CreateSubscription)
+	router.GET("/user/:hash", rest.GetUserElement)
 
 	docs.SwaggerInfo.BasePath = ""
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
