@@ -43,15 +43,46 @@ func (cartService *CartService) Create(dto model.CreateCartDto, hash string) err
 }
 
 func (cartService *CartService) GetElement(dto model.CardElementDto) (model.CardElementResult, error) {
-	var cardResult model.CardElementResult
+	var cartElementResult model.CardElementResult
 
-	subscription, err := cartService.repository.IsExistCard(dto.Hash)
+	serialNumber, err := cartService.repository.GetSerialNumber(dto.Hash)
 
 	if err != nil {
-		return cardResult, err
+		return cartElementResult, err
 	}
 
-	_ = subscription
+	if serialNumber == "" {
+		return cartElementResult, err
+	}
 
-	return cardResult, nil
+	webCitrusSuccessResponse, err := cartService.webClient.GetElement(serialNumber)
+
+	if err != nil {
+		return cartElementResult, err
+	}
+
+	cartElementResult.FirstName = webCitrusSuccessResponse.Data.Fields.FirstName
+	cartElementResult.LastName = webCitrusSuccessResponse.Data.Fields.LastName
+	cartElementResult.PhoneNumber = webCitrusSuccessResponse.Data.Fields.PhoneNumber
+	cartElementResult.Email = webCitrusSuccessResponse.Data.Fields.Email
+	cartElementResult.BirdDate = webCitrusSuccessResponse.Data.Fields.BirdDate
+	cartElementResult.Link = webCitrusSuccessResponse.Data.Link
+	cartElementResult.PassNumber = webCitrusSuccessResponse.Data.PassNumber
+
+	return cartElementResult, nil
+}
+
+func (cartService *CartService) CardRemove(hash string) error {
+
+	serialNumber, err := cartService.repository.GetSerialNumber(hash)
+	if err != nil {
+		return err
+	}
+
+	err = cartService.webClient.RemoveCardClient(serialNumber)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

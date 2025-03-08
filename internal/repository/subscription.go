@@ -63,8 +63,8 @@ func (repository *SubscriptionRepository) GetByHash(hash string) (model.Subscrip
 	return subscriptionModel, nil
 }
 
-func (repository *SubscriptionRepository) IsExistCard(hash string) (bool, error) {
-	isExist := false
+func (repository *SubscriptionRepository) GetSerialNumber(hash string) (string, error) {
+	//isExist := false
 	var cardUuid *string
 
 	query := "select card_uuid from subscription where hash = $1"
@@ -72,14 +72,14 @@ func (repository *SubscriptionRepository) IsExistCard(hash string) (bool, error)
 	err := repository.db.QueryRow(repository.ctx, query, hash).Scan(&cardUuid)
 
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return false, err
+		return *cardUuid, err
 	}
 
-	if cardUuid != nil && len(*cardUuid) != 0 {
-		isExist = true
+	if cardUuid == nil {
+		return "", nil
 	}
 
-	return isExist, nil
+	return *cardUuid, nil
 }
 
 func (repository *SubscriptionRepository) UpdateCardUuid(hash string, serialNumber string) error {

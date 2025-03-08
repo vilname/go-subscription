@@ -18,6 +18,7 @@ func InitRoute() *gin.Engine {
 	router.GET("/user/:hash", rest.GetUserElement)
 	router.POST("/cart/create/:hash", rest.CartCreate)
 	router.GET("/card/element/:hash", rest.CardElement)
+	router.DELETE("/card/remove/:hash", rest.CardRemove)
 
 	docs.SwaggerInfo.BasePath = ""
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

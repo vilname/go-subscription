@@ -17,12 +17,10 @@ func NewCartWebCitrus() *CartWebCitrus {
 	return &CartWebCitrus{}
 }
 
-func (CartWebclient *CartWebCitrus) Create(dto model.CreateCartDto) (model.WebCitrusSuccessResponse, error) {
+func (cartWebclient *CartWebCitrus) Create(dto model.CreateCartDto) (model.WebCitrusSuccessResponse, error) {
 	var webCitrusSuccessResponse model.WebCitrusSuccessResponse
 
 	urlApi := os.Getenv("URL_WEB_CITRUS")
-	clientId := os.Getenv("WC_CLIENT_ID")
-	clientSecret := os.Getenv("WC_CLIENT_SECRET")
 
 	var webCitrusModel model.WebCitrus
 	webCitrusModel.ProjectId = 21
@@ -39,6 +37,81 @@ func (CartWebclient *CartWebCitrus) Create(dto model.CreateCartDto) (model.WebCi
 	if err != nil {
 		return webCitrusSuccessResponse, err
 	}
+
+	webCitrusSuccessResponse, err = cartWebclient.responseClient(req)
+
+	if err != nil {
+		return webCitrusSuccessResponse, err
+	}
+
+	return webCitrusSuccessResponse, nil
+}
+
+func (cartWebclient *CartWebCitrus) GetElement(serialNumber string) (model.WebCitrusSuccessResponse, error) {
+	var webCitrusSuccessResponse model.WebCitrusSuccessResponse
+
+	urlApi := os.Getenv("URL_WEB_CITRUS")
+
+	req, err := http.NewRequest("GET", urlApi+"/passes/"+serialNumber, nil)
+
+	if err != nil {
+		return webCitrusSuccessResponse, err
+	}
+
+	webCitrusSuccessResponse, err = cartWebclient.responseClient(req)
+
+	if err != nil {
+		return webCitrusSuccessResponse, err
+	}
+
+	return webCitrusSuccessResponse, nil
+}
+
+func (cartWebclient *CartWebCitrus) RemoveCardClient(serialNumber string) error {
+	//passes/{serial_number}/registrations
+
+	urlApi := os.Getenv("URL_WEB_CITRUS")
+
+	req, err := http.NewRequest("DELETE", urlApi+"/passes/"+serialNumber+"/registrations", nil)
+
+	if err != nil {
+		return err
+	}
+
+	clientId := os.Getenv("WC_CLIENT_ID")
+	clientSecret := os.Getenv("WC_CLIENT_SECRET")
+
+	req.Header.Set("X-Client-Id", clientId)
+	req.Header.Set("X-Client-Secret", clientSecret)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{
+		Timeout: time.Second * 5,
+	}
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		return err
+	}
+
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	_ = body
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (cartWebclient *CartWebCitrus) responseClient(req *http.Request) (model.WebCitrusSuccessResponse, error) {
+	var webCitrusSuccessResponse model.WebCitrusSuccessResponse
+
+	clientId := os.Getenv("WC_CLIENT_ID")
+	clientSecret := os.Getenv("WC_CLIENT_SECRET")
 
 	req.Header.Set("X-Client-Id", clientId)
 	req.Header.Set("X-Client-Secret", clientSecret)

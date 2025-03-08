@@ -71,3 +71,23 @@ func CardElement(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, cardElement)
 }
+
+// CardRemove godoc
+// @Tags Карта
+// @Param hash path string true "Hash"
+// @Summary Удаление карты
+// @Accept json
+// @Produce json
+// @Failure	400	{object} helper.ErrorValidate "Ошибка валидации"
+// @Failure	500	{object} helper.ErrorResponse "Другие ошибки"
+// @Router /cart/remove/{hash} [delete]
+func CardRemove(ctx *gin.Context) {
+	cartService := service.NewCartService(ctx)
+	err := cartService.CardRemove(ctx.Param("hash"))
+	if err != nil {
+		helper.ErrorResponseMethod(ctx, err)
+		return
+	}
+
+	ctx.JSON(http.StatusOK, ctx)
+}
