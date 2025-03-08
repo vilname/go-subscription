@@ -7,6 +7,7 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"subscription-back/config/storage"
+	"subscription-back/internal/model"
 )
 
 type SubscriptionRepository struct {
@@ -48,16 +49,47 @@ func (repository *SubscriptionRepository) GetByEmail(email string) (int, error) 
 	return id, nil
 }
 
-func (repository *SubscriptionRepository) GetByHash(hash string) (int, error) {
-	var id int
+func (repository *SubscriptionRepository) GetByHash(hash string) (model.SubscriptionModel, error) {
+	var subscriptionModel model.SubscriptionModel
 
-	query := "select id from subscription where hash = $1"
+	query := "select id, email from subscription where hash = $1"
 
-	err := repository.db.QueryRow(repository.ctx, query, hash).Scan(&id)
+	err := repository.db.QueryRow(repository.ctx, query, hash).Scan(&subscriptionModel.Id, &subscriptionModel.Email)
 
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return id, err
+		return subscriptionModel, err
 	}
 
-	return id, nil
+	return subscriptionModel, nil
+}
+
+func (repository *SubscriptionRepository) IsExistCard(hash string) (bool, error) {
+	isExist := false
+	var cardUuid *string
+
+	query := "select card_uuid from subscription where hash = $1"
+
+	err := repository.db.QueryRow(repository.ctx, query, hash).Scan(&cardUuid)
+
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return false, err
+	}
+
+	if cardUuid != nil && len(*cardUuid) != 0 {
+		isExist = true
+	}
+
+	return isExist, nil
+}
+
+func (repository *SubscriptionRepository) UpdateCardUuid(hash string, serialNumber string) error {
+	query := "update subscription set card_uuid = $1 where hash = $2"
+
+	_, err := repository.db.Exec(repository.ctx, query, serialNumber, hash)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

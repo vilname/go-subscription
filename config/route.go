@@ -16,6 +16,8 @@ func InitRoute() *gin.Engine {
 
 	router.POST("/subscription/create", rest.CreateSubscription)
 	router.GET("/user/:hash", rest.GetUserElement)
+	router.POST("/cart/create/:hash", rest.CartCreate)
+	router.GET("/card/element/:hash", rest.CardElement)
 
 	docs.SwaggerInfo.BasePath = ""
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))

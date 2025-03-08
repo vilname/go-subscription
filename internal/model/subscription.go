@@ -7,3 +7,8 @@ type CreateSubscriptionDto struct {
 type CreateSubscriptionResult struct {
 	Hash string `json:"hash"`
 }
+
+type SubscriptionModel struct {
+	Id    int    `json:"id"`
+	Email string `json:"email"`
+}

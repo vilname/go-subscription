@@ -3,21 +3,35 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strings"
 	"subscription-back/internal/repository"
 )
 
 func Auth(ctx *gin.Context) {
-	if ctx.Request.URL.String() == "/subscription/create" {
+	if ctx.Request.Method == "OPTIONS" {
+		ctx.Writer.WriteHeader(http.StatusOK)
+		return
+	}
+
+	url := ctx.Request.URL.String()
+
+	if url == "/subscription/create" || strings.Contains(url, "swagger") {
 		ctx.Next()
 		return
 	}
 
-	hash := ctx.Param("hash")
+	auth := ctx.GetHeader("Authorization")
+	if auth == "" {
+		ctx.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	hash := strings.Split(auth, "Bearer ")[1]
 
 	subscriptionRepository := repository.NewSubscriptionRepository(ctx)
-	id, err := subscriptionRepository.GetByHash(hash)
+	subscriptionModel, err := subscriptionRepository.GetByHash(hash)
 
-	if id == 0 || err != nil {
+	if subscriptionModel.Id == 0 || err != nil {
 		ctx.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
