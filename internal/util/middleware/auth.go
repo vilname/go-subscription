@@ -20,13 +20,17 @@ func Auth(ctx *gin.Context) {
 		return
 	}
 
-	auth := ctx.GetHeader("Authorization")
-	if auth == "" {
-		ctx.AbortWithStatus(http.StatusUnauthorized)
-		return
-	}
+	hash := url[len(url)-36:]
 
-	hash := strings.Split(auth, "Bearer ")[1]
+	//auth := ctx.GetHeader("Authorization")
+	//if auth == "" {
+	//	ctx.AbortWithStatus(http.StatusUnauthorized)
+	//	return
+	//}
+	//
+	//hash := strings.Split(auth, "Bearer ")[1]
+
+	//ctx.Set("token", hash)
 
 	subscriptionRepository := repository.NewSubscriptionRepository(ctx)
 	subscriptionModel, err := subscriptionRepository.GetByHash(hash)

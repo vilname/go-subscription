@@ -15,7 +15,7 @@ func InitRoute() *gin.Engine {
 	router.Use(middleware.Auth)
 
 	router.POST("/subscription/create", rest.CreateSubscription)
-	router.GET("/user/:hash", rest.GetUserElement)
+	router.GET("/cabinet/:hash", rest.GetCabinetElement)
 	router.POST("/cart/create/:hash", rest.CartCreate)
 	router.GET("/card/element/:hash", rest.CardElement)
 	router.DELETE("/card/remove/:hash", rest.CardRemove)

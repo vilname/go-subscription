@@ -28,16 +28,10 @@ func InitDB() {
 			dbHost, dbUser, dbPass, dbName, dbPort),
 	)
 
-	//driver, _ := postgres.WithInstance(dbSql, &postgres.Config{})
-	//m, _ := migrate.NewWithDatabaseInstance(
-	//	"file://migration",
-	//	"postgres", driver)
-	//
-	//if err = m.Up(); err != nil && err != migrate.ErrNoChange {
-	//	_ = fmt.Errorf("error when migration up: %v", err)
-	//}
-
-	dbSql.Close()
+	err = dbSql.Close()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error close database: %v\n", err)
+	}
 
 	db, err = pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {

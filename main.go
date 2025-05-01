@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"github.com/joho/godotenv"
 	"os"
@@ -29,10 +28,10 @@ func main() {
 	storage.InitDB()
 	router := config.InitRoute()
 
-	defer func(ctx context.Context) {
+	defer func() {
 		db := storage.GetDB()
 		db.Close()
-	}(context.Background())
+	}()
 
 	fmt.Println("init")
 

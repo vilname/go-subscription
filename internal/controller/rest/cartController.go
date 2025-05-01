@@ -17,6 +17,7 @@ import (
 // @Summary Создание карты
 // @Accept json
 // @Produce json
+//
 // @Failure	400	{object} helper.ErrorValidate "Ошибка валидации"
 // @Failure	500	{object} helper.ErrorResponse "Другие ошибки"
 // @Router /cart/create/{hash} [post]
